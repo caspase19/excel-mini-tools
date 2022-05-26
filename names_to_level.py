@@ -3,14 +3,6 @@ import xlwt
 
 subject_tuple = ("总分","语文","数学","英语","物理","化学","生物","政治","历史","地理")
 
-#def level(class_num):
-#    if class_num in [7,8,9,10,11]:
-#       return 6000, 11000
-#    elif class_num in [12,13,14,15]:
-#        return 11000, 19000
-#    elif class_num in [16,17]:
-#        return 19000, 21000
-
 def counts(list1, score1, score2):
     a, b = 0, 0
     for i in range(len(list1)):
