@@ -2,11 +2,11 @@ import xlrd
 import xlwt
 
 def subject_index(subject_name):
-    subject_tuple = ("总分","语文","数学","英语","物理","化学","生物","政治","历史","地理")
-    subject_num = 6 + 4 * subject_tuple.index(subject_name)
+#    subject_tuple = ("总分","语文","数学","英语","物理","化学","生物","政治","历史","地理")
+#    subject_num = 6 + 4 * subject_tuple.index(subject_name)
 
-#    subject_tuple = ("化学","政治","地理","生物","总分")
-#    subject_num = 2 + subject_tuple.index(subject_name)
+    subject_tuple = ("化学","政治","地理","生物","总分")
+    subject_num = 2 + subject_tuple.index(subject_name)
 
 #    subject_num = 5
     return subject_num

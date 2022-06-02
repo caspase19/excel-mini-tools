@@ -1,49 +1,53 @@
-# 读取成绩单“ranks.xls”，给出某班分属两个给定分段的人数
+from openpyxl import Workbook
+from openpyxl import load_workbook
 
-import xlrd
-import xlwt
+CLASS_NUM_COL = 3
+TOTAL_SCORE_COL = 6
+EXAM = "高一上期末"
+PARTS = ((7,8,9,10,11),(12,13,14,15),(16,17))
 
-def level(class_num):
-    if class_num in [7,8,9,10,11]:
+def level(classNum):
+    if classNum in PARTS[0]:
         return 6000, 11000
-    elif class_num in [12,13,14,15]:
+    elif classNum in PARTS[1]:
         return 11000, 19000
-    elif class_num in [16,17]:
+    elif classNum in PARTS[2]:
         return 19000, 21000
 
-# 生成某班学生成绩组成的列表
-def generate(class_num,subject_num):
-    list_1 = []
-    for i in range(nrows):
-        if ranks.cell_value(i,1) == class_num:
-            list_1.append(ranks.cell_value(i,subject_num))
-    list_1 = [i for i in list_1 if i != ""]
-    return list_1
+# Generate a list of students' ranks, remove absent students'
+def generate(classNum,subjectNum):
+    rankList = []
+    for i in ranks.values:
+        if i[CLASS_NUM_COL] == classNum:# adjust this type (int/str) 
+            rankList.append([i[TOTAL_SCORE_COL], i[subjectNum]])
+    rankList = [i for i in rankList if i[0] != "" and i[1] != ""]
+    return rankList
 
-# 统计列表中分属两个给定分段的人数
-def counts(list1, score1, score2):
+def counts(rankList, highLevel, mediumLevel):
     a, b = 0, 0
-    for i in range(len(list1)):
-        if list1[i] <= score1:
-            a += 1
-        elif list1[i] <= score2:
-            b += 1
+    for i in rankList:
+        if i[0] <= highLevel:
+            if i[1] <= highLevel:
+                a += 1
+        elif i[0] <= mediumLevel:
+            if i[1] <= mediumLevel:
+                b += 1
     return a, b
 
-book = xlrd.open_workbook("ranks高一下期中.xls")
-ranks = book.sheet_by_index(0)
-nrows = ranks.nrows
-results = xlwt.Workbook(encoding = 'utf-8')
-results_sheet = results.add_sheet("期中总分")
-results_sheet.write(0,0,"班级")
-results_sheet.write(1,0,"高分段")
-results_sheet.write(2,0,"中分段")
-for i in range(7,18):
-    rank_list = generate(i,5)
-    print(i, rank_list)
-    result = counts(rank_list, level(i)[0], level(i)[1])
-    results_sheet.write(0,i-6,i)
-    results_sheet.write(1,i-6,result[0])
-    results_sheet.write(2,i-6,result[1])
-results.save("期中总分.xls")
+def write(numList):
+    for i in numList:
+        for j in range(9):
+            rankList = generate(i,TOTAL_SCORE_COL+4+4*j)
+            result = counts(rankList, level(i)[0], level(i)[1])
+            results.active.cell(row=a+i-numList[0], column=2+j, value=result[0])
+            results.active.cell(row=a+i-numList[0]+len(numList), column=2+j, value=result[1])
+
+
+book = load_workbook(f"成绩单/{EXAM}.xlsx")
+ranks = book.active
+results = Workbook()
+for i in PARTS:
+    a = 11 * PARTS.index(i) + 1
+    write(i)
+results.save(f"{EXAM}基数.xlsx")
 
